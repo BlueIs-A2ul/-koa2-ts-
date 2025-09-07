@@ -43,7 +43,7 @@ router.get('/:id',auth, PostController.getPostByPostId)
  * @param {PostUpdateParams} Object
  * @method PATCH
  */
-//TODO router.patch('/:id', auth, postValidator, PostController.updatePost)
+router.patch('/:id', auth, postValidator, PostController.updatePost)
 
 /**
  * @function deletePost
@@ -51,7 +51,7 @@ router.get('/:id',auth, PostController.getPostByPostId)
  * @param {string} id - 帖子ID
  * @method DELETE
  */
-//TODO router.delete('/:id', auth, PostController.deletePost)
+router.delete('/:id', auth, PostController.deletePost)
 
 /**
  * @function likePost
@@ -59,6 +59,25 @@ router.get('/:id',auth, PostController.getPostByPostId)
  * @param {string} id - 帖子ID
  * @method POST
  */
-//TODO router.post('/:id/like', auth, PostController.likePost)
+router.post('/:id/like', auth, PostController.likePost)
+
+//以下是post的comment模块
+/**
+ * @function createComment
+ * @description 创建评论
+ * @param {string} id - 帖子ID
+ * @param {CommentCreateParams} Object
+ * @method POST
+ */
+//router.post('/:id/comment', auth, PostController.createComment)
+
+//router.get('/:id/comment', auth, PostController.getComments)
+
+//router.delete('/:id/comment/:commentId', auth, PostController.deleteComment)
+
+//router.post('/:id/comments/:commentId/reply', auth, PostController.replyComment)
+
+//router.post('/:id/comments/:commentId/like', auth, PostController.likeComment)
+
 
 export default router

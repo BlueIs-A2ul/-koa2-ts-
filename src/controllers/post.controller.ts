@@ -12,7 +12,11 @@ import {
   postUploadFail,
   postGetAllError,
   postGetByIdPowerError,  
+  postUpdateFail,
+  postDeleteFail,
+  postLikeError,
 } from "../constant/err.type"
+
 import { Types } from 'mongoose'
 
 class PostController { 
@@ -36,6 +40,7 @@ class PostController {
       console.log(error)
       postUploadFail.result = error
       ctx.app.emit('error', postUploadFail, ctx)
+      return
     }
   }
 
@@ -83,12 +88,14 @@ class PostController {
       } else {
         postGetAllError.result = 'res为null'
         ctx.app.emit('error', postGetAllError, ctx)
+        return 
       }
     }
     catch (error) {
       console.log(error)
       postGetAllError.result = error
       ctx.app.emit('error', postGetAllError, ctx)
+      return 
     }
   }
 
@@ -110,6 +117,76 @@ class PostController {
     }
   }
   
+  public async updatePost(ctx: Context) { 
+    try {
+      const id = (ctx.request as any).params.id
+
+      const res = await PostService.updatePost(id, (ctx.request as any).body)
+
+      return ctx.body = {
+        code: 200,
+        message: '更新文章成功',
+        result: res
+      }
+    }
+    catch (error) {
+      console.log(error)
+      postUpdateFail.result = error
+      ctx.app.emit('error', postUpdateFail, ctx)
+      return 
+    }
+  }
+
+  public async deletePost(ctx: Context) { 
+    try {
+      const userId = ctx.state.user._doc._id
+      const postId = (ctx.request as any).params.id
+      console.log(userId, postId)
+      const res = await PostService.deletePost(userId, postId)
+
+      if (!res) {
+        postDeleteFail.result = '删除失败'
+        ctx.app.emit('error', postDeleteFail, ctx)
+        return
+      }
+      ctx.body = {
+        code: 200,
+        message: '删除文章成功',
+        result: res
+      }
+    }
+    catch (error) {
+      console.log(error)
+      postDeleteFail.result = error
+      ctx.app.emit('error', postDeleteFail, ctx)
+      return
+    }
+  }
+
+  public async likePost(ctx: Context) {
+    try {
+      const userId = ctx.state.user._doc._id
+      const postId = (ctx.request as any).params.id
+      const res = await PostService.likePost(userId, postId)
+
+      if (!res) {
+        postLikeError.result = '点赞失败'
+        ctx.app.emit('error', postLikeError, ctx)
+        return
+      }
+
+      ctx.body = {
+        code: 200,
+        message: '点赞成功',
+        result: res
+      }
+    }
+    catch (error) {
+      console.log(error)
+      postLikeError.result = error
+      ctx.app.emit('error', postLikeError, ctx)
+    }
+  }
 }
 
 export default new PostController()

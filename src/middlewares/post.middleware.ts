@@ -8,9 +8,7 @@ import {
 } from '../types/post.type'
 const postValidator = async (ctx: Context, next: () => Promise<any>) => { 
   const body = (ctx.request as any).body as PostCreateParams
-
   const { title, content } = body
-
   if (!title) {
     ctx.status = 400
     ctx.body = {

@@ -102,6 +102,24 @@ export const postGetByIdPowerError = {
   result: ''
 }
 
+export const postUpdateFail = {
+  code: '10304',
+  message: '更新文章失败',
+  result: ''
+}
+
+export const postDeleteFail = {
+  code: '10305',
+  message: '删除文章失败',
+  result: ''
+}
+
+export const postLikeError = {
+  code: '10306',
+  message: '点赞文章失败',
+  result: ''
+}
+
 /**
  * profile相关错误
  * @code 104都是用户profile相关的错误
