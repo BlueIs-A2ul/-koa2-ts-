@@ -15,6 +15,7 @@ export interface CommentDocumentType extends Document {
 export type CommentCreateParams = {
   content: string;
   post: Types.ObjectId;
+  author: Types.ObjectId;
   parent?: Types.ObjectId;
 }
 
@@ -29,4 +30,10 @@ export type CommentQueryParams = {
   parent?: Types.ObjectId | null;
   author?: Types.ObjectId;
   isApproved?: boolean;
+}
+
+export type CommentReplyParams = {
+  postId: Types.ObjectId;
+  userId: Types.ObjectId;
+  commentId: Types.ObjectId;
 }

@@ -39,6 +39,28 @@ const auth = async (ctx: Context, next:()=>Promise<any>) => {
   await next()
 }
 
+const validator = (rules) => {
+  return async (ctx: Context, next: ()=>Promise<any>) => { 
+    try {
+      ctx.verifyParams(rules)
+    }
+    catch (e) {
+      console.log(e) 
+      postFormateError.result = e
+      ctx.app.emit('error', postFormateError, ctx)
+      return 
+    }
+    await next()
+  }
+}
+
 export {
-  auth
+  auth,
+  validator
+}
+
+const postFormateError = {
+    code: '10501',
+    message: '请求参数格式错误',
+    result: ''
 }

@@ -1,7 +1,7 @@
 import Router from "koa-router"
 
 import PostController from "../controllers/post.controller"
-import { auth } from "../middlewares/auth.middleware"
+import { auth,validator } from "../middlewares/auth.middleware"
 import {
   postValidator,
   postImgUploader,
@@ -69,15 +69,48 @@ router.post('/:id/like', auth, PostController.likePost)
  * @param {CommentCreateParams} Object
  * @method POST
  */
-//router.post('/:id/comment', auth, PostController.createComment)
+router.post('/:id/comment', auth, validator({
+  content: { type: 'string', required: true, message: '评论内容不能为空' },
+}), PostController.createComment)
 
-//router.get('/:id/comment', auth, PostController.getComments)
+/** 
+ * @function getComments
+ * @description 获取评论列表
+ * @param {string} id - 帖子ID
+ * @param {number} pageNum - 页码，默认为1
+ * @param {number} pageSize - 每页数量，默认为10
+ * @method GET
+ */
+router.get('/:id/comment', auth, PostController.getAllComments)
 
-//router.delete('/:id/comment/:commentId', auth, PostController.deleteComment)
+/**
+ * @function deleteComment
+ * @description 删除评论
+ * @param {string} id - 帖子ID
+ * @param {string} commentId - 评论ID
+ * @method DELETE
+ */
+router.delete('/:id/comment/:commentId', auth,PostController.deleteComment)
+/**
+ * @function replyComment
+ * @description 回复评论
+ * @param {string} id - 帖子ID
+ * @param {string} commentId - 评论ID
+ * @param {CommentCreateParams} Object
+ * @method POST
+ */
+router.post('/:id/comment/:commentId', auth, validator({
+  content: { type: 'string', required: true, message: '评论内容不能为空' },
+}), PostController.replyComment)
 
-//router.post('/:id/comments/:commentId/reply', auth, PostController.replyComment)
-
-//router.post('/:id/comments/:commentId/like', auth, PostController.likeComment)
+/**
+ * @function likeComment
+ * @description 点赞评论
+ * @param {string} id - 帖子ID
+ * @param {string} commentId - 评论ID
+ * @method POST
+ */
+router.post('/:id/comment/:commentId/like', auth, PostController.likeComment)
 
 
 export default router

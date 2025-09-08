@@ -120,6 +120,36 @@ export const postLikeError = {
   result: ''
 }
 
+export const commentPostError = {
+  code: '10307',
+  message: '评论文章失败',
+  result: ''
+}
+
+export const commentGetAllError = {
+  code: '10308',
+  message: '获取评论列表失败',
+  result: ''
+}
+
+export const commentDeleteError = {
+  code: '10309',
+  message: '删除评论失败',
+  result: ''
+}
+
+export const commentReplyError = {
+  code: '10310',
+  message: '回复评论失败',
+  result: ''
+}
+
+export const commentLikeError = {
+  code: '10311',
+  message: '点赞评论失败',
+  result: ''
+}
+
 /**
  * profile相关错误
  * @code 104都是用户profile相关的错误

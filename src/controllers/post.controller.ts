@@ -5,8 +5,13 @@ import PostService from '../services/post.service'
 import {
   PostCreateParams,
   PostDocumentType,
-  PostQueryParams
+  PostQueryParams,
 } from "../types/post.type"
+
+import {
+  CommentCreateParams,
+  CommentQueryParams
+} from "../types/comment.type"
 
 import {
   postUploadFail,
@@ -15,6 +20,11 @@ import {
   postUpdateFail,
   postDeleteFail,
   postLikeError,
+  commentPostError,
+  commentGetAllError,
+  commentDeleteError,
+  commentReplyError,
+  commentLikeError,
 } from "../constant/err.type"
 
 import { Types } from 'mongoose'
@@ -185,6 +195,147 @@ class PostController {
       console.log(error)
       postLikeError.result = error
       ctx.app.emit('error', postLikeError, ctx)
+    }
+  }
+
+  public async createComment(ctx: Context) {
+    const postId = (ctx.request as any).params.id as Types.ObjectId
+    const userId = ctx.state.user._doc._id
+    const commentData: {
+      content: string
+    } = (ctx.request as any).body
+
+    try {
+      const res = await PostService.createComment({
+        ...commentData,
+        post: postId,
+        author: userId
+      } as CommentCreateParams)
+
+      if (!res) {
+        commentPostError.result = '创建评论失败'
+        ctx.app.emit('error', commentPostError, ctx)
+        return 
+      }
+      ctx.body = {
+        code: 200,
+        message: '创建评论成功',
+        result: res
+      }
+    }
+    catch (error) {
+      console.log(error)
+      commentPostError.result = error
+      ctx.app.emit('error', commentPostError, ctx)
+    }
+  }
+
+  public async getAllComments(ctx: Context) { 
+    try {
+      const postId = (ctx.request as any).params.id as Types.ObjectId
+      const { pageNum = 1, pageSize = 10 } = (ctx.request as any).query
+
+      const res = await PostService.getAllComments({ post: postId }, pageNum, pageSize)
+
+      if (!res) {
+        commentGetAllError.result = '获取评论失败'
+        ctx.app.emit('error', commentGetAllError, ctx)
+        return
+      }
+
+      ctx.body = {
+        code: 200,
+        message: '获取评论成功',
+        result: res
+      }
+    }
+    catch (error) {
+      console.log(error)
+      commentGetAllError.result = error
+      ctx.app.emit('error', commentGetAllError, ctx)
+    }
+  }
+
+  public async deleteComment(ctx: Context) { 
+    try {
+      const postId = (ctx.request as any).params.id as Types.ObjectId
+      const userId = ctx.state.user._doc._id
+      const commentId = (ctx.request as any).params.commentId
+
+      const res = await PostService.deleteComment({postId, userId, commentId})
+      if (!res || res instanceof String) {
+        commentDeleteError.result = '删除评论失败'
+        ctx.app.emit('error', commentDeleteError, ctx)
+        return
+      }
+
+      ctx.body = {
+        code: 200,
+        message: '删除评论成功',
+        result: res
+      }
+    }
+    catch (error) {
+      console.log(error)
+      commentDeleteError.result = error
+      ctx.app.emit('error', commentDeleteError, ctx)
+    }
+  }
+
+  public async replyComment(ctx: Context) {
+    try { 
+      const postId = (ctx.request as any).params.id as Types.ObjectId
+      const userId = ctx.state.user._doc._id
+      const commentId = (ctx.request as any).params.commentId
+      const content = (ctx.request as any).body.content
+
+      const res = await PostService.replyComment(
+        { postId, userId, commentId },
+        content
+      )
+
+      if (!res || typeof res === 'string') {
+        commentReplyError.result = res === null ? '回复评论失败' : res as string
+        ctx.app.emit('error', commentReplyError, ctx)
+        return
+      }
+
+      ctx.body = {
+        code: 200,
+        message: '回复评论成功',
+        result: res
+      }
+    }
+    catch (error) {
+      console.log(error)
+      commentReplyError.result = error
+      ctx.app.emit('error', commentReplyError, ctx)
+    }
+  }
+
+  public async likeComment(ctx: Context) {
+    try { 
+      const userId = ctx.state.user._doc._id
+      const commentId = (ctx.request as any).params.commentId
+      const postId = (ctx.request as any).params.id as Types.ObjectId
+      
+      const res = await PostService.likeComment({ postId, userId, commentId })
+      
+      if (!res || typeof res === 'string') {
+        commentLikeError.result = res === null ? '点赞评论失败' : res as string
+        ctx.app.emit('error', commentLikeError, ctx)
+        return
+      }
+      ctx.body = {
+        code: 200,
+        message: '点赞评论成功',
+        result: res
+      }
+    }
+    catch {
+      commentLikeError.result = '点赞评论失败'
+      ctx.app.emit('error', commentLikeError, ctx)
+      return
     }
   }
 }
